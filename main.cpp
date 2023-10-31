@@ -1,9 +1,10 @@
 #include <iostream>
 #include "Matrix/Matrix.h"
+#include "LU_decomposition/LU_decomposition.h"
 
 void task1()
 {
-    std::string filename = "../LU_decomposition/input.txt";
+    std::string filename = "../input.txt";
     std::ifstream input_file(filename);
 
     int n;
@@ -35,22 +36,18 @@ void task1()
 
     out_file << "LU разложение:" << std::endl;
 
-    Matrix L(n, n);
-    Matrix U(n, n);
-    Matrix P(n, n);
-    int not_used = 0;
-    A.lu_decomposition(A, L, U, P, not_used);
+    LU_decomposition solver(A);
 
-    out_file << "Матрица L:" << std::endl << L << std::endl;
-    out_file << "Матрица U:" << std::endl << U << std::endl;
-    out_file << "Матрица P:" << std::endl << P << std::endl;
-    out_file << "Произведение P * L * U:" << std::endl << P * L * U << std::endl;
+    out_file << "Матрица L:" << std::endl << solver.get_L() << std::endl;
+    out_file << "Матрица U:" << std::endl << solver.get_U() << std::endl;
+    out_file << "Матрица P:" << std::endl << solver.get_P() << std::endl;
+    out_file << "Произведение P * L * U:" << std::endl << solver.get_PLU() << std::endl;
 
 
     out_file << "Решение СЛАУ:" << std::endl;
     try
     {
-        std::vector<double> result = A.solve(B);
+        std::vector<double> result = solver.solve(B);
         for (int i = 0; i < B.size(); ++i)
         {
             out_file << "x" << i + 1 << " = " << result[i] << std::endl;
@@ -67,7 +64,7 @@ void task1()
     out_file << "Определитель матрицы:" << std::endl;
     try
     {
-        out_file << A.get_determinant() << std::endl;
+        out_file << solver.get_determinant() << std::endl;
 
         out_file << std::endl;
     }
@@ -80,7 +77,7 @@ void task1()
 
     try
     {
-        auto inverse = A.get_inverse();
+        auto inverse = solver.get_inverse();
         out_file << inverse << std::endl;
 
         out_file << "Произведение исходной матрицы на обратную A * A^-1 = E:" << std::endl;
@@ -99,7 +96,7 @@ void task1()
 
 int main() {
 
-
+    task1();
     return 0;
 }
 

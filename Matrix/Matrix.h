@@ -1,3 +1,6 @@
+#ifndef MATRIX_H
+#define MATRIX_H
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -19,19 +22,13 @@ private:
 
 public:
 
+    Matrix();
+
     Matrix(int, int);
 
     void inputMatrix();
 
     void inputMatrixFromFile(std::ifstream & filename);
-
-    void lu_decomposition(Matrix& L, Matrix& U, Matrix& P, int &count_per) const;
-
-    [[nodiscard]] std::vector<double> solve(std::vector<double> b) const;
-
-    [[nodiscard]] double get_determinant() const;
-
-    [[nodiscard]] Matrix get_inverse() const;
 
 public:
 
@@ -63,3 +60,5 @@ private:
 
     static void swap_row(Matrix & matrix, int i, int j);
 };
+
+#endif //MATRIX_H
