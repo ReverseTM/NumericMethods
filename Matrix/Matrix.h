@@ -9,6 +9,7 @@
 class Matrix final {
 
     friend class LU_decomposition;
+    friend class sweep_method;
 
 private:
 

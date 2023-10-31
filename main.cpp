@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Matrix/Matrix.h"
 #include "LU_decomposition/LU_decomposition.h"
+#include "Sweep_method/sweep_method.h"
 
 void task1()
 {
@@ -94,9 +95,64 @@ void task1()
     std::cout << "Done! Check file outfile.txt" << std::endl;
 }
 
+void task2()
+{
+    std::string filename = "../input.txt";
+    std::ifstream input_file(filename);
+
+    int n;
+    input_file >> n;
+
+    Matrix A(n, n);
+
+    A.inputMatrixFromFile(input_file);
+
+    std::vector<double> B(n);
+
+    for (int i = 0; i < n; ++i)
+    {
+        input_file >> B[i];
+    }
+
+    input_file.close();
+
+    sweep_method solver(A);
+
+    std::ofstream out_file("../outfile.txt");
+
+    out_file << "Исходная матрица матрица:" << std::endl << A << std::endl;
+    out_file << "Вектор столбец:" << std::endl;
+    for (auto item : B)
+    {
+        out_file << item << std::endl;
+    }
+
+    out_file << std::endl;
+
+    out_file << "Решение СЛАУ:" << std::endl;
+    try
+    {
+        std::vector<double> result = solver.solution(B);
+        for (int i = 0; i < B.size(); ++i)
+        {
+            out_file << "x" << i + 1 << " = " << result[i] << std::endl;
+        }
+
+        out_file << std::endl;
+    }
+    catch (std::exception &ex)
+    {
+        out_file << ex.what();
+    }
+
+    out_file.close();
+
+    std::cout << "Done! Check file outfile.txt" << std::endl;
+}
+
 int main() {
 
-    task1();
+    task2();
     return 0;
 }
 
