@@ -1,16 +1,15 @@
-#include "sweep_method.h"
+#include "SweepMethod.h"
 
-sweep_method::sweep_method(Matrix &A) :
-    matrix(A),
-    rows(A.rows),
-    cols(A.cols),
+SweepMethod::SweepMethod(Matrix &A) :
     P(A.rows),
     Q(A.rows)
 {
-
+    this->matrix = A;
+    this->rows = A.rows;
+    this->cols = A.cols;
 }
 
-std::vector<double> sweep_method::solution(std::vector<double> b)
+std::vector<double> SweepMethod::solution(std::vector<double> vector)
 {
     if (!is_correct_matrix())
     {
@@ -19,19 +18,19 @@ std::vector<double> sweep_method::solution(std::vector<double> b)
 
     // Для первой строки
     P[0] = (-matrix.data[0][1]) / matrix.data[0][0];
-    Q[0] = b[0] / matrix.data[0][0];
+    Q[0] = vector[0] / matrix.data[0][0];
 
     // Прямой ход
     for (int i = 1; i < rows - 1; ++i)
     {
         P[i] = (-matrix.data[i][i + 1]) / (matrix.data[i][i] + matrix.data[i][i - 1] * P[i - 1]);
-        Q[i] = (b[i] - matrix.data[i][i - 1] * Q[i - 1]) / (matrix.data[i][i] + matrix.data[i][i - 1] * P[i - 1]);
+        Q[i] = (vector[i] - matrix.data[i][i - 1] * Q[i - 1]) / (matrix.data[i][i] + matrix.data[i][i - 1] * P[i - 1]);
     }
 
-    // Для последней стрки
+    // Для последней строки
     P[rows - 1] = 0;
     Q[rows - 1] =
-            (b[rows - 1] - matrix.data[rows - 1][rows - 2] * Q[rows - 2])
+            (vector[rows - 1] - matrix.data[rows - 1][rows - 2] * Q[rows - 2])
             /
             (matrix.data[rows - 1][rows - 1] + matrix.data[rows - 1][rows - 2] * P[rows - 2]);
 
@@ -46,7 +45,7 @@ std::vector<double> sweep_method::solution(std::vector<double> b)
     return result;
 }
 
-bool sweep_method::is_correct_matrix() const
+bool SweepMethod::is_correct_matrix() const
 {
     if (
          fabs(matrix.data[0][0]) < fabs(matrix.data[0][1])
@@ -80,4 +79,13 @@ bool sweep_method::is_correct_matrix() const
     }
 
     return true;
+}
+
+std::vector<double> SweepMethod::get_P() const
+{
+    return P;
+}
+std::vector<double> SweepMethod::get_Q() const
+{
+    return Q;
 }

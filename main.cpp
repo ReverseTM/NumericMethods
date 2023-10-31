@@ -1,12 +1,19 @@
 #include <iostream>
-#include "Matrix/Matrix.h"
-#include "LU_decomposition/LU_decomposition.h"
-#include "Sweep_method/sweep_method.h"
+#include "Solutions/LU_decomposition/LUDecomposition.h"
+#include "Solutions/Sweep_method/SweepMethod.h"
+
+std::string inputFileName = "../FilesWithResults/input.txt";
+std::string outputFileName = "../FilesWithResults/outfile.txt";
 
 void task1()
 {
-    std::string filename = "../input.txt";
-    std::ifstream input_file(filename);
+    std::ifstream input_file(inputFileName);
+
+    if (!input_file.is_open())
+    {
+        std::cout << "File not open!" << std::endl;
+        return;
+    }
 
     int n;
     input_file >> n;
@@ -24,9 +31,9 @@ void task1()
 
     input_file.close();
 
-    std::ofstream out_file("../outfile.txt");
+    std::ofstream out_file(outputFileName);
 
-    out_file << "Исходная матрица матрица:" << std::endl << A << std::endl;
+    out_file << "Исходная матрица:" << std::endl << A << std::endl;
     out_file << "Вектор столбец:" << std::endl;
     for (auto item : B)
     {
@@ -37,7 +44,7 @@ void task1()
 
     out_file << "LU разложение:" << std::endl;
 
-    LU_decomposition solver(A);
+    LUDecomposition solver(A);
 
     out_file << "Матрица L:" << std::endl << solver.get_L() << std::endl;
     out_file << "Матрица U:" << std::endl << solver.get_U() << std::endl;
@@ -48,7 +55,7 @@ void task1()
     out_file << "Решение СЛАУ:" << std::endl;
     try
     {
-        std::vector<double> result = solver.solve(B);
+        auto result = solver.solution(B);
         for (int i = 0; i < B.size(); ++i)
         {
             out_file << "x" << i + 1 << " = " << result[i] << std::endl;
@@ -60,7 +67,6 @@ void task1()
     {
         out_file << ex.what();
     }
-
 
     out_file << "Определитель матрицы:" << std::endl;
     try
@@ -97,8 +103,13 @@ void task1()
 
 void task2()
 {
-    std::string filename = "../input.txt";
-    std::ifstream input_file(filename);
+    std::ifstream input_file(inputFileName);
+
+    if (!input_file.is_open())
+    {
+        std::cout << "File not open!" << std::endl;
+        return;
+    }
 
     int n;
     input_file >> n;
@@ -116,11 +127,11 @@ void task2()
 
     input_file.close();
 
-    sweep_method solver(A);
+    SweepMethod solver(A);
 
-    std::ofstream out_file("../outfile.txt");
+    std::ofstream out_file(outputFileName);
 
-    out_file << "Исходная матрица матрица:" << std::endl << A << std::endl;
+    out_file << "Исходная матрица:" << std::endl << A << std::endl;
     out_file << "Вектор столбец:" << std::endl;
     for (auto item : B)
     {
@@ -132,7 +143,7 @@ void task2()
     out_file << "Решение СЛАУ:" << std::endl;
     try
     {
-        std::vector<double> result = solver.solution(B);
+        auto result = solver.solution(B);
         for (int i = 0; i < B.size(); ++i)
         {
             out_file << "x" << i + 1 << " = " << result[i] << std::endl;

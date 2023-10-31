@@ -2,8 +2,6 @@
 
 Matrix::Matrix() :
         rows(0), cols(0),
-        output_file("../output.txt"),
-        debug_file("../debug.txt"),
         data(0, std::vector<double>(0))
 {
 
@@ -12,8 +10,6 @@ Matrix::Matrix() :
 Matrix::Matrix(int n, int m) :
         rows(n),
         cols(m),
-        output_file("../output.txt"),
-        debug_file("../debug.txt"),
         data(n, std::vector<double>(m))
 {
 

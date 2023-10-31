@@ -8,8 +8,8 @@
 
 class Matrix final {
 
-    friend class LU_decomposition;
-    friend class sweep_method;
+    friend class LUDecomposition;
+    friend class SweepMethod;
 
 private:
 
@@ -17,9 +17,6 @@ private:
 
     int rows;
     int cols;
-
-    std::string debug_file;
-    std::string output_file;
 
 public:
 
