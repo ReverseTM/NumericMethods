@@ -5,8 +5,49 @@ LUDecomposition::LUDecomposition(Matrix &A)
     this->matrix = A;
     this->rows = A.rows;
     this->cols = A.cols;
+    this->L = Matrix(rows, cols);
+    this->U = Matrix(rows, cols);
+    this->P = Matrix(rows, cols);
 
     lu_decomposition();
+}
+
+std::vector<double> LUDecomposition::solution(std::vector<double> vector)
+{
+    if (get_determinant() == 0)
+    {
+        throw std::runtime_error("Given matrix has zero or infinity solutions!");
+    }
+
+    vector = ~P * vector;
+
+    std::vector<double> Z(rows);
+
+    for (int i = 0; i < rows; ++i)
+    {
+        double sum = 0;
+        for (int j = 0; j < i; ++j)
+        {
+            sum += L.data[i][j] * Z[j];
+        }
+
+        Z[i] = vector[i] - sum;
+    }
+
+    std::vector<double> X(rows);
+
+    for (int i = rows -1; i >= 0; --i)
+    {
+        double sum = 0;
+        for (int j = U.cols; j >= 1; --j)
+        {
+            sum += U.data[i][j] * X[j];
+        }
+
+        X[i] = (Z[i] - sum) / U.data[i][i];
+    }
+
+    return X;
 }
 
 void LUDecomposition::lu_decomposition()
@@ -48,44 +89,6 @@ void LUDecomposition::lu_decomposition()
     }
 
     P = ~P;
-}
-
-std::vector<double> LUDecomposition::solution(std::vector<double> vector)
-{
-    if (get_determinant() == 0)
-    {
-        throw std::runtime_error("Given matrix has zero or infinity solutions!");
-    }
-
-    vector = ~P * vector;
-
-    std::vector<double> Z(rows);
-
-    for (int i = 0; i < rows; ++i)
-    {
-        double sum = 0;
-        for (int j = 0; j < i; ++j)
-        {
-            sum += L.data[i][j] * Z[j];
-        }
-
-        Z[i] = vector[i] - sum;
-    }
-
-    std::vector<double> X(rows);
-
-    for (int i = rows -1; i >= 0; --i)
-    {
-        double sum = 0;
-        for (int j = U.cols; j >= 1; --j)
-        {
-            sum += U.data[i][j] * X[j];
-        }
-
-        X[i] = (Z[i] - sum) / U.data[i][i];
-    }
-
-    return X;
 }
 
 double LUDecomposition::get_determinant()

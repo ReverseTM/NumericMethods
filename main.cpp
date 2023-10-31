@@ -1,169 +1,156 @@
 #include <iostream>
+#include <tuple>
 #include "Solutions/LU_decomposition/LUDecomposition.h"
 #include "Solutions/Sweep_method/SweepMethod.h"
 
 std::string inputFileName = "../FilesWithResults/input.txt";
 std::string outputFileName = "../FilesWithResults/outfile.txt";
 
-void task1()
+std::ostream& operator<<(std::ostream &out, const std::vector<double> &vector)
 {
-    std::ifstream input_file(inputFileName);
+    for (auto element : vector) out << element << std::endl;
+    return out;
+}
 
-    if (!input_file.is_open())
+std::istream& operator>>(std::istream& in, std::vector<double> &vector)
+{
+    for (double &element : vector) in >> element;
+    return in;
+}
+
+std::tuple<Matrix, std::vector<double>> getResources()
+{
+    std::ifstream inputFile(inputFileName);
+    if (!inputFile.is_open())
     {
         std::cout << "File not open!" << std::endl;
-        return;
+        exit(0);
     }
 
     int n;
-    input_file >> n;
+    inputFile >> n;
 
     Matrix A(n, n);
-
-    A.inputMatrixFromFile(input_file);
+    A.inputMatrixFromFile(inputFile);
 
     std::vector<double> B(n);
+    inputFile >> B;
 
-    for (int i = 0; i < n; ++i)
-    {
-        input_file >> B[i];
-    }
+    inputFile.close();
 
-    input_file.close();
+    return std::make_tuple(A, B);
+}
 
-    std::ofstream out_file(outputFileName);
+void outputOfInitialValues(std::ostream &out, Matrix &A, std::vector<double> &vector)
+{
+    out << "Исходная матрица:" << std::endl;
+    out << A << std::endl;
+    out << "Вектор столбец:" << std::endl;
+    out << vector << std::endl;
+}
 
-    out_file << "Исходная матрица:" << std::endl << A << std::endl;
-    out_file << "Вектор столбец:" << std::endl;
-    for (auto item : B)
-    {
-        out_file << item << std::endl;
-    }
+std::vector<double> solveSystem(AbstractSolution &solver, std::vector<double> &vector)
+{
+    return solver.solution(vector);
+}
 
-    out_file << std::endl;
+void outputOfTheSystemSolution(std::ostream &out, std::vector<double> &vector)
+{
+    out << "Решение СЛАУ:" << std::endl;
+    for (int i = 0; i < vector.size(); ++i) out << "x" << i + 1 << " = " << vector[i] << std::endl;
+}
 
-    out_file << "LU разложение:" << std::endl;
+void task1()
+{
+    auto resources = getResources();
+    Matrix A = std::get<0>(resources);
+    std::vector vector = std::get<1>(resources);
+
+    std::ofstream outputFile(outputFileName);
+
+    outputOfInitialValues(outputFile, A, vector);
 
     LUDecomposition solver(A);
 
-    out_file << "Матрица L:" << std::endl << solver.get_L() << std::endl;
-    out_file << "Матрица U:" << std::endl << solver.get_U() << std::endl;
-    out_file << "Матрица P:" << std::endl << solver.get_P() << std::endl;
-    out_file << "Произведение P * L * U:" << std::endl << solver.get_PLU() << std::endl;
-
-
-    out_file << "Решение СЛАУ:" << std::endl;
+    std::vector<double> answer;
     try
     {
-        auto result = solver.solution(B);
-        for (int i = 0; i < B.size(); ++i)
-        {
-            out_file << "x" << i + 1 << " = " << result[i] << std::endl;
-        }
-
-        out_file << std::endl;
+        answer = solveSystem(solver, vector);
+        outputOfTheSystemSolution(outputFile, answer);
     }
     catch (std::exception &ex)
     {
-        out_file << ex.what();
+        outputFile << ex.what();
+        outputFile.close();
+        return;
     }
 
-    out_file << "Определитель матрицы:" << std::endl;
+    outputFile << "LU разложение:" << std::endl;
+    outputFile << "Матрица L:" << std::endl << solver.get_L() << std::endl;
+    outputFile << "Матрица U:" << std::endl << solver.get_U() << std::endl;
+    outputFile << "Матрица P:" << std::endl << solver.get_P() << std::endl;
+    outputFile << "Произведение P * L * U:" << std::endl << solver.get_PLU() << std::endl;
+
+    outputFile << std::endl << "Определитель матрицы:" << std::endl;
     try
     {
-        out_file << solver.get_determinant() << std::endl;
-
-        out_file << std::endl;
+        outputFile << solver.get_determinant() << std::endl;
     }
     catch (std::exception &ex)
     {
-        out_file << ex.what();
+        outputFile << ex.what();
     }
 
-    out_file << "Обратная матрица:" << std::endl;
-
+    outputFile << std::endl <<  "Обратная матрица:" << std::endl;
     try
     {
         auto inverse = solver.get_inverse();
-        out_file << inverse << std::endl;
+        outputFile << inverse << std::endl;
 
-        out_file << "Произведение исходной матрицы на обратную A * A^-1 = E:" << std::endl;
-        out_file << A * inverse << std::endl;
+        outputFile << "Произведение исходной матрицы на обратную A * A^-1 = E:" << std::endl;
+        outputFile << A * inverse << std::endl;
 
     }
     catch (std::exception &ex)
     {
-        out_file << ex.what();
+        outputFile << ex.what();
     }
 
-    out_file.close();
+    outputFile.close();
 
     std::cout << "Done! Check file outfile.txt" << std::endl;
 }
 
 void task2()
 {
-    std::ifstream input_file(inputFileName);
+    auto resources = getResources();
+    Matrix A = std::get<0>(resources);
+    std::vector vector = std::get<1>(resources);
 
-    if (!input_file.is_open())
-    {
-        std::cout << "File not open!" << std::endl;
-        return;
-    }
+    std::ofstream outputFile(outputFileName);
 
-    int n;
-    input_file >> n;
-
-    Matrix A(n, n);
-
-    A.inputMatrixFromFile(input_file);
-
-    std::vector<double> B(n);
-
-    for (int i = 0; i < n; ++i)
-    {
-        input_file >> B[i];
-    }
-
-    input_file.close();
+    outputOfInitialValues(outputFile, A, vector);
 
     SweepMethod solver(A);
 
-    std::ofstream out_file(outputFileName);
-
-    out_file << "Исходная матрица:" << std::endl << A << std::endl;
-    out_file << "Вектор столбец:" << std::endl;
-    for (auto item : B)
-    {
-        out_file << item << std::endl;
-    }
-
-    out_file << std::endl;
-
-    out_file << "Решение СЛАУ:" << std::endl;
+    std::vector<double> answer;
     try
     {
-        auto result = solver.solution(B);
-        for (int i = 0; i < B.size(); ++i)
-        {
-            out_file << "x" << i + 1 << " = " << result[i] << std::endl;
-        }
-
-        out_file << std::endl;
+        answer = solveSystem(solver, vector);
+        outputOfTheSystemSolution(outputFile, answer);
+        std::cout << "Done! Check file outfile.txt" << std::endl;
     }
     catch (std::exception &ex)
     {
-        out_file << ex.what();
+        outputFile << ex.what();
     }
 
-    out_file.close();
-
-    std::cout << "Done! Check file outfile.txt" << std::endl;
+    outputFile.close();
 }
 
 int main() {
 
-    task2();
+    task1();
     return 0;
 }
 
