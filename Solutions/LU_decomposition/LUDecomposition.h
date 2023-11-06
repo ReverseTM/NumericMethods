@@ -20,7 +20,7 @@ public:
 
 public:
 
-    [[nodiscard]] std::vector<double> solution(std::vector<double> vector) override;
+    [[nodiscard]] std::vector<double> solution(std::vector<double> vector, double epsilon = 0.1, int maxIterations = 1000) override;
 
     [[nodiscard]] double get_determinant();
 

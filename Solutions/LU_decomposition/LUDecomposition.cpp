@@ -1,10 +1,8 @@
 #include "LUDecomposition.h"
 
-LUDecomposition::LUDecomposition(Matrix &A)
+LUDecomposition::LUDecomposition(Matrix &A) :
+    AbstractSolution(A)
 {
-    this->matrix = A;
-    this->rows = A.rows;
-    this->cols = A.cols;
     this->L = Matrix(rows, cols);
     this->U = Matrix(rows, cols);
     this->P = Matrix(rows, cols);
@@ -12,7 +10,7 @@ LUDecomposition::LUDecomposition(Matrix &A)
     lu_decomposition();
 }
 
-std::vector<double> LUDecomposition::solution(std::vector<double> vector)
+std::vector<double> LUDecomposition::solution(std::vector<double> vector, double not_used1, int node_used2)
 {
     if (get_determinant() == 0)
     {

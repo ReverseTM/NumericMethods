@@ -1,15 +1,14 @@
 #include "SweepMethod.h"
 
 SweepMethod::SweepMethod(Matrix &A) :
+    AbstractSolution(A),
     P(A.rows),
     Q(A.rows)
 {
-    this->matrix = A;
-    this->rows = A.rows;
-    this->cols = A.cols;
+
 }
 
-std::vector<double> SweepMethod::solution(std::vector<double> vector)
+std::vector<double> SweepMethod::solution(std::vector<double> vector, double not_used1, int not_used2)
 {
     if (!is_correct_matrix())
     {

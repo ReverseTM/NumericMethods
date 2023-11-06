@@ -8,10 +8,13 @@
 
 class Matrix final {
 
+    friend class AbstractSolution;
     friend class LUDecomposition;
     friend class SweepMethod;
     friend class SimpleIterationsMethod;
     friend class SeidelMethod;
+    friend class AbstractFinder;
+    friend class RotationMethod;
 
 private:
 
@@ -22,9 +25,9 @@ private:
 
 public:
 
-    Matrix();
+    explicit Matrix();
 
-    Matrix(int, int);
+    explicit Matrix(int, int);
 
     void inputMatrix();
 

@@ -8,15 +8,13 @@ class SeidelMethod final : public AbstractSolution
 
 private:
 
-    double epsilon;
-
     long long iterations = 0;
 
 public:
 
-    SeidelMethod(Matrix &A, double eps);
+    explicit SeidelMethod(Matrix &A);
 
-    std::vector<double> solution(std::vector<double> vector) override;
+    std::vector<double> solution(std::vector<double> b, double epsilon = 0.1, int maxIterations = 1000) override;
 
     long long getCountIterations() const;
 

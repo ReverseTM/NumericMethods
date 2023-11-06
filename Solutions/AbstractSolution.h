@@ -17,8 +17,13 @@ protected:
 
 public:
 
-    virtual std::vector<double> solution(std::vector<double> vector) = 0;
+    explicit AbstractSolution(Matrix &A);
+
     virtual ~AbstractSolution() = default;
+
+public:
+
+    virtual std::vector<double> solution(std::vector<double> vector, double epsilon = 0.1, int maxIterations = 1000) = 0;
 };
 
 #endif //ABSTRACT_SOLUTION_H

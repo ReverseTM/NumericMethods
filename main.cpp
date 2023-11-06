@@ -1,7 +1,7 @@
 #include <iostream>
 #include <tuple>
 #include "Solutions/LU_decomposition/LUDecomposition.h"
-#include "Solutions/Sweep_method/SweepMethod.h"
+#include "Solutions/SweepMethod/SweepMethod.h"
 #include "Solutions/SimpleIterationsMethod/SimpleIterationsMethod.h"
 #include "Solutions/SeidelMethod/SeidelMethod.h"
 
@@ -51,9 +51,9 @@ void outputOfInitialValues(std::ostream &out, Matrix &A, std::vector<double> &ve
     out << vector << std::endl;
 }
 
-std::vector<double> solveSystem(AbstractSolution &solver, std::vector<double> &vector)
+std::vector<double> solveSystem(AbstractSolution &solver, std::vector<double> &vector, double epsilon = 0.1, int maxIterations = 1000)
 {
-    return solver.solution(vector);
+    return solver.solution(vector, epsilon, maxIterations);
 }
 
 void outputOfTheSystemSolution(std::ostream &out, std::vector<double> &vector)
@@ -160,22 +160,23 @@ void task3()
 
     outputOfInitialValues(outputFile, A, vector);
 
-    double eps = 0.000001;
-
     std::vector<AbstractSolution*> solvers
     {
-        new SimpleIterationsMethod(A, eps),
-        new SeidelMethod(A, eps)
+        new SimpleIterationsMethod(A),
+        new SeidelMethod(A)
     };
 
     std::vector<std::string> methodName = {"Метод простых итераций", "Метод Зейделя"};
+
+    double eps = 0.000001;
+    int maxIterations = 1000;
 
     try
     {
         for (int i = 0; i < solvers.size(); ++i)
         {
-            outputFile << "Решение используя " + methodName[i] << std::endl;
-            std::vector<double> answer = solveSystem(*(solvers[i]), vector);
+            outputFile << "Решение используя " + methodName[i] << " с точностью epsilon = " << eps << std::endl;
+            std::vector<double> answer = solveSystem(*(solvers[i]), vector, eps, maxIterations);
             outputOfTheSystemSolution(outputFile, answer);
             outputFile << "Количество итераций " << ((SeidelMethod*)solvers[i])->getCountIterations() << std::endl << std::endl;
         }

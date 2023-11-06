@@ -1,14 +1,12 @@
 #include "SeidelMethod.h"
 
-SeidelMethod::SeidelMethod(Matrix &A, double eps)
+SeidelMethod::SeidelMethod(Matrix &A) :
+    AbstractSolution(A)
 {
-    matrix = A;
-    rows = A.rows;
-    cols = A.cols;
-    epsilon = eps;
+
 }
 
-std::vector<double> SeidelMethod::solution(std::vector<double> vector)
+std::vector<double> SeidelMethod::solution(std::vector<double> vector, double epsilon, int maxIterations)
 {
     if (!isCorrectMatrix())
     {
@@ -17,15 +15,13 @@ std::vector<double> SeidelMethod::solution(std::vector<double> vector)
 
     std::vector<double> X(rows);
 
-    int max_iterations = 1000;
-
     //Начальное приближение
     for (int i = 0; i < rows; ++i)
     {
         X[i] = vector[i] / matrix.data[i][i];
     }
 
-    for (; iterations < max_iterations; ++iterations)
+    for (; iterations < maxIterations; ++iterations)
     {
         //Следующие приближения
         std::vector<double> Xn(rows);

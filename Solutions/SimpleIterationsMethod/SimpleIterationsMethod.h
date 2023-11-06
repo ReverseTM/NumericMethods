@@ -8,17 +8,15 @@ class SimpleIterationsMethod final : public AbstractSolution
 
 private:
 
-    double epsilon;
-
     long long iterations = 0;
 
 public:
 
-    explicit SimpleIterationsMethod(Matrix &A, double eps);
+    explicit SimpleIterationsMethod(Matrix &A);
 
 public:
 
-    std::vector<double> solution(std::vector<double> vector) override;
+    std::vector<double> solution(std::vector<double> b, double epsilon = 0.1, int maxIterations = 1000) override;
 
 public:
 

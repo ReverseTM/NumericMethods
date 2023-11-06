@@ -15,7 +15,7 @@ public:
 
     explicit SweepMethod(Matrix &A);
 
-    std::vector<double> solution(std::vector<double> b) override;
+    std::vector<double> solution(std::vector<double> b, double epsilon = 0.1, int maxIterations = 1000) override;
 
 private:
 
