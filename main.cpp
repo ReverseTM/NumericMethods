@@ -2,6 +2,8 @@
 #include <tuple>
 #include "Solutions/LU_decomposition/LUDecomposition.h"
 #include "Solutions/Sweep_method/SweepMethod.h"
+#include "Solutions/SimpleIterationsMethod/SimpleIterationsMethod.h"
+#include "Solutions/SeidelMethod/SeidelMethod.h"
 
 std::string inputFileName = "../FilesWithResults/input.txt";
 std::string outputFileName = "../FilesWithResults/outfile.txt";
@@ -148,9 +150,51 @@ void task2()
     outputFile.close();
 }
 
+void task3()
+{
+    auto resources = getResources();
+    Matrix A = std::get<0>(resources);
+    std::vector vector = std::get<1>(resources);
+
+    std::ofstream outputFile(outputFileName);
+
+    outputOfInitialValues(outputFile, A, vector);
+
+    double eps = 0.000001;
+
+    std::vector<AbstractSolution*> solvers
+    {
+        new SimpleIterationsMethod(A, eps),
+        new SeidelMethod(A, eps)
+    };
+
+    std::vector<std::string> methodName = {"Метод простых итераций", "Метод Зейделя"};
+
+    try
+    {
+        for (int i = 0; i < solvers.size(); ++i)
+        {
+            outputFile << "Решение используя " + methodName[i] << std::endl;
+            std::vector<double> answer = solveSystem(*(solvers[i]), vector);
+            outputOfTheSystemSolution(outputFile, answer);
+            outputFile << "Количество итераций " << ((SeidelMethod*)solvers[i])->getCountIterations() << std::endl << std::endl;
+        }
+        std::cout << "Успешно! Проверьте файл outfile.txt" << std::endl;
+    }
+    catch (std::exception &ex)
+    {
+        outputFile << ex.what();
+        outputFile.close();
+        for (auto solver : solvers) delete solver;
+    }
+
+    outputFile.close();
+    for (auto solver : solvers) delete solver;
+}
+
 int main() {
 
-    task1();
+    task3();
     return 0;
 }
 

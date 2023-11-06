@@ -10,6 +10,8 @@ class Matrix final {
 
     friend class LUDecomposition;
     friend class SweepMethod;
+    friend class SimpleIterationsMethod;
+    friend class SeidelMethod;
 
 private:
 
