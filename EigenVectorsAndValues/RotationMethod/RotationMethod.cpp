@@ -26,6 +26,7 @@ std::tuple<Matrix, std::vector<double>> RotationMethod::find(double epsilon, int
 
         for (int i = 0; i < rows; ++i)
         {
+            //Нахождения максимального по модулю недиагонального элемента
             for (int j = i + 1; j < cols; ++j)
             {
                 sum += A.data[i][j] * A.data[i][j];
@@ -42,11 +43,13 @@ std::tuple<Matrix, std::vector<double>> RotationMethod::find(double epsilon, int
 
         if (stop_iteration < epsilon) break;
 
-        double angle = 0.5 * atan(2 * A.data[p][q] / (A.data[p][p] - A.data[q][q]));
-//                (A.data[p][p] == A.data[q][q])
-//                ? (M_PI / 4)
-                //: 0.5 * atan(2 * A.data[p][q] / (A.data[p][p] - A.data[q][q]));
+        //Угол поворота
+        double angle =
+                (A.data[p][p] == A.data[q][q])
+                ? (M_PI / 4)
+                : 0.5 * atan(2 * A.data[p][q] / (A.data[p][p] - A.data[q][q]));
 
+        //Матрица поворота
         Matrix U(rows, cols);
         for (int i = 0; i < rows; ++i) U.data[i][i] = 1.0;
 
@@ -55,12 +58,16 @@ std::tuple<Matrix, std::vector<double>> RotationMethod::find(double epsilon, int
         U.data[p][q] = -sin(angle);
         U.data[q][p] = sin(angle);
 
+        //Обновление матриц
         A = (~U * A) * U;
         V = V * U;
     }
 
     std::vector<double> eigenValues(rows);
     for (int i = 0; i < rows; ++i) eigenValues[i] = A.data[i][i];
+
+    //Столбцы матрицы V являются собственными векторами
+    //Диагональные элементы матрицы A являются собственными значениями
 
     return std::make_tuple(V, eigenValues);
 }
