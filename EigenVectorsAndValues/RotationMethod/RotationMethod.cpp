@@ -28,7 +28,7 @@ std::tuple<Matrix, std::vector<double>> RotationMethod::find(double epsilon, int
         {
             for (int j = i + 1; j < cols; ++j)
             {
-                sum += A.data[i][i] * A.data[i][i];
+                sum += A.data[i][j] * A.data[i][j];
                 if (fabs(A.data[i][j]) > maxValue)
                 {
                     maxValue = fabs(A.data[i][j]);
@@ -42,10 +42,10 @@ std::tuple<Matrix, std::vector<double>> RotationMethod::find(double epsilon, int
 
         if (stop_iteration < epsilon) break;
 
-        double angle =
-                (A.data[p][p] == A.data[q][q])
-                ? (M_PI / 4)
-                : 0.5 * atan(2 * A.data[p][q] / (A.data[p][p] - A.data[q][q]));
+        double angle = 0.5 * atan(2 * A.data[p][q] / (A.data[p][p] - A.data[q][q]));
+//                (A.data[p][p] == A.data[q][q])
+//                ? (M_PI / 4)
+                //: 0.5 * atan(2 * A.data[p][q] / (A.data[p][p] - A.data[q][q]));
 
         Matrix U(rows, cols);
         for (int i = 0; i < rows; ++i) U.data[i][i] = 1.0;

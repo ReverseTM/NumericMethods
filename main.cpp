@@ -98,7 +98,7 @@ void outputEigenVectorsAndValues(std::ostream &out, std::tuple<Matrix, std::vect
     for (int i = 0; i < EigenVectors.getRows(); ++i)
     {
         out << "Вектор #" << i + 1 << ": ";
-        EigenVectors.printRow(out, i);
+        EigenVectors.printCol(out, i);
         out << std::endl;
     }
 
