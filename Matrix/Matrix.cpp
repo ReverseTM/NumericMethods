@@ -191,6 +191,19 @@ void Matrix::operator*() const
     std::cout << *this;
 }
 
+bool operator==(const Matrix &A, const Matrix &B)
+{
+    if (A.rows != B.rows) return false;
+    if (A.cols != B.cols) return false;
+    if (A.data != B.data) return false;
+    return true;
+}
+
+bool operator!=(const Matrix &A, const Matrix &B)
+{
+    return !(A == B);
+}
+
 Matrix operator~(const Matrix &A)
 {
     Matrix C(A.cols, A.rows);
@@ -204,4 +217,34 @@ Matrix operator~(const Matrix &A)
     }
 
     return C;
+}
+
+void Matrix::printRow(std::ostream &out, int rowIndex) const
+{
+    if (rowIndex < 0 || rowIndex > rows) throw std::runtime_error("Index out of bound!");
+    for (int i = 0; i < cols; ++i)
+    {
+        out << data[rowIndex][i];
+        if (i != cols - 1) out << " ";
+    }
+}
+
+void Matrix::printCol(std::ostream &out, int colIndex) const
+{
+    if (colIndex < 0 || colIndex > cols) throw std::runtime_error("Index out of bound!");
+    for (int i = 0; i < rows; ++i)
+    {
+        out << data[i][colIndex];
+        if (i != rows - 1) out << " ";
+    }
+}
+
+int Matrix::getRows() const
+{
+    return rows;
+}
+
+int Matrix::getCols() const
+{
+    return cols;
 }

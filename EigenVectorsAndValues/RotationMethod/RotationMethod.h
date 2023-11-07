@@ -16,7 +16,14 @@ public:
 
 public:
 
-    std::tuple<std::vector<double>, Matrix> find(Matrix &A, double epsilon, int maxIterations) override;
+    std::tuple<Matrix, std::vector<double>> find(double epsilon, int maxIterations) override;
+
+    [[nodiscard]] long long getCountIterations() const;
+
+private:
+
+    bool isCorrectMatrix() const;
+
 };
 
 #endif //ROTATION_METHOD_H

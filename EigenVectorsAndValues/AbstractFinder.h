@@ -25,7 +25,7 @@ public:
 
 public:
 
-    virtual std::tuple<std::vector<double>, Matrix> find(Matrix &A, double epsilon, int maxIterations) = 0;
+    virtual std::tuple<Matrix, std::vector<double>> find(double epsilon, int maxIterations) = 0;
 
 };
 

@@ -4,6 +4,7 @@
 #include "Solutions/SweepMethod/SweepMethod.h"
 #include "Solutions/SimpleIterationsMethod/SimpleIterationsMethod.h"
 #include "Solutions/SeidelMethod/SeidelMethod.h"
+#include "EigenVectorsAndValues/RotationMethod/RotationMethod.h"
 
 std::string inputFileName = "../FilesWithResults/input.txt";
 std::string outputFileName = "../FilesWithResults/outfile.txt";
@@ -18,6 +19,32 @@ std::istream& operator>>(std::istream& in, std::vector<double> &vector)
 {
     for (double &element : vector) in >> element;
     return in;
+}
+
+std::tuple<Matrix, double, int> getResourcesForEigenVectors()
+{
+    std::ifstream inputFile(inputFileName);
+    if (!inputFile.is_open())
+    {
+        std::cout << "File not open!" << std::endl;
+        exit(0);
+    }
+
+    int n;
+    inputFile >> n;
+
+    Matrix A(n, n);
+    A.inputMatrixFromFile(inputFile);
+
+    double epsilon;
+    inputFile >> epsilon;
+
+    int maxIterations;
+    inputFile >> maxIterations;
+
+    inputFile.close();
+
+    return std::make_tuple(A, epsilon, maxIterations);
 }
 
 std::tuple<Matrix, std::vector<double>> getResources()
@@ -43,6 +70,12 @@ std::tuple<Matrix, std::vector<double>> getResources()
     return std::make_tuple(A, B);
 }
 
+void outputOfInitialValues(std::ostream &out, Matrix &A)
+{
+    out << "Исходная матрица:" << std::endl;
+    out << A << std::endl;
+}
+
 void outputOfInitialValues(std::ostream &out, Matrix &A, std::vector<double> &vector)
 {
     out << "Исходная матрица:" << std::endl;
@@ -54,6 +87,23 @@ void outputOfInitialValues(std::ostream &out, Matrix &A, std::vector<double> &ve
 std::vector<double> solveSystem(AbstractSolution &solver, std::vector<double> &vector, double epsilon = 0.1, int maxIterations = 1000)
 {
     return solver.solution(vector, epsilon, maxIterations);
+}
+
+void outputEigenVectorsAndValues(std::ostream &out, std::tuple<Matrix, std::vector<double>> &answer)
+{
+    auto EigenVectors = std::get<0>(answer);
+    auto EigenValues = std::get<1>(answer);
+
+    out << "Собственные векторы:" << std::endl;
+    for (int i = 0; i < EigenVectors.getRows(); ++i)
+    {
+        out << "Вектор #" << i + 1 << ": ";
+        EigenVectors.printRow(out, i);
+        out << std::endl;
+    }
+
+    out << std::endl << "Собственные значения:" << std::endl;
+    for (int i = 0; i < EigenValues.size(); ++i) out << "Значение " << i + 1 << " = " << EigenValues[i] << std::endl;
 }
 
 void outputOfTheSystemSolution(std::ostream &out, std::vector<double> &vector)
@@ -74,10 +124,9 @@ void task1()
 
     LUDecomposition solver(A);
 
-    std::vector<double> answer;
     try
     {
-        answer = solveSystem(solver, vector);
+        std::vector<double> answer = solveSystem(solver, vector);
         outputOfTheSystemSolution(outputFile, answer);
     }
     catch (std::exception &ex)
@@ -101,6 +150,7 @@ void task1()
     catch (std::exception &ex)
     {
         outputFile << ex.what();
+        outputFile.close();
     }
 
     outputFile << std::endl <<  "Обратная матрица:" << std::endl;
@@ -116,6 +166,7 @@ void task1()
     catch (std::exception &ex)
     {
         outputFile << ex.what();
+        outputFile.close();
     }
 
     outputFile.close();
@@ -135,16 +186,16 @@ void task2()
 
     SweepMethod solver(A);
 
-    std::vector<double> answer;
     try
     {
-        answer = solveSystem(solver, vector);
+        std::vector<double> answer = solveSystem(solver, vector);
         outputOfTheSystemSolution(outputFile, answer);
         std::cout << "Done! Check file outfile.txt" << std::endl;
     }
     catch (std::exception &ex)
     {
         outputFile << ex.what();
+        outputFile.close();
     }
 
     outputFile.close();
@@ -193,9 +244,39 @@ void task3()
     for (auto solver : solvers) delete solver;
 }
 
+void task4()
+{
+    auto resources = getResourcesForEigenVectors();
+    Matrix A = std::get<0>(resources);
+    double epsilon = std::get<1>(resources);
+    int maxIterations = std::get<2>(resources);
+
+    std::ofstream outputFile(outputFileName);
+
+    outputOfInitialValues(outputFile, A);
+
+    RotationMethod solver(A);
+
+    try
+    {
+        outputFile << "Значения собственных векторов и значений, найденных методом вращений с точностью epsilon = " << epsilon << std::endl;
+        auto answer = solver.find(epsilon, maxIterations);
+        outputEigenVectorsAndValues(outputFile, answer);
+        outputFile << std::endl << "Количество итераций " << solver.getCountIterations() << std::endl;
+        std::cout << "Done! Check file outfile.txt" << std::endl;
+    }
+    catch (std::exception &ex)
+    {
+        outputFile << ex.what();
+        outputFile.close();
+    }
+
+    outputFile.close();
+}
+
 int main() {
 
-    task3();
+    task4();
     return 0;
 }
 

@@ -33,6 +33,14 @@ public:
 
     void inputMatrixFromFile(std::ifstream & filename);
 
+    int getRows() const;
+
+    int getCols() const;
+
+    void printRow(std::ostream &out, int rowIndex) const;
+
+    void printCol(std::ostream &out,int colIndex) const;
+
 public:
 
     friend std::ostream& operator<<(std::ostream &out, const Matrix &matrix);
@@ -52,6 +60,10 @@ public:
     friend Matrix operator-(const Matrix &A, const Matrix &B);
 
     friend Matrix operator+(const Matrix &A, const Matrix &B);
+
+    friend bool operator==(const Matrix &A, const Matrix &B);
+
+    friend bool operator!=(const Matrix &A, const Matrix &B);
 
     friend Matrix operator~(const Matrix &A);
 
