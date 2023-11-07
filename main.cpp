@@ -112,6 +112,36 @@ void outputOfTheSystemSolution(std::ostream &out, std::vector<double> &vector)
     for (int i = 0; i < vector.size(); ++i) out << "x" << i + 1 << " = " << vector[i] << std::endl;
 }
 
+void check(std::ostream &out, Matrix &A, std::tuple<Matrix, std::vector<double>> &answer)
+{
+    auto EigenVectors = std::get<0>(answer);
+    auto EigenValues = std::get<1>(answer);
+
+    for (int i = 0; i < EigenVectors.getCols(); ++i)
+    {
+        std::vector<double> EigenVector = EigenVectors.getCol(i);
+
+        std::vector<double> multiplyMatrixAndEigenVector = A * EigenVector;
+
+        out << "Для собственного вектора (";
+        for (int j = 0; j < EigenVector.size(); ++j) out << EigenVector[j] << ((j != EigenVector.size() - 1) ? ", " : ")^T ");
+        out << "и собственного значения " << EigenValues[i] << std::endl;
+
+        out << "A * EigenVector" << std::endl << "(";
+        for (int j = 0; j < EigenVector.size(); ++j) out << multiplyMatrixAndEigenVector[i] << ((j != EigenVector.size() - 1) ? ", " : ")^T");
+
+        out << std::endl;
+
+        std::vector<double> multiplyEigenValueAndEigenVector(EigenVector.size());
+        for (int j = 0; j < EigenVector.size(); ++j) multiplyEigenValueAndEigenVector[j] = EigenValues[i] * EigenVector[j];
+
+        out << "EigenValue * EigenVector" << std::endl << "(";
+        for (int j = 0; j < EigenVector.size(); ++j) out << multiplyEigenValueAndEigenVector[i] << ((j != EigenVector.size() - 1) ? ", " : ")^T");;
+
+        out << std::endl << std::endl;
+    }
+}
+
 void task1()
 {
     auto resources = getResources();
@@ -259,10 +289,12 @@ void task4()
 
     try
     {
-        outputFile << "Значения собственных векторов и значений, найденных методом вращений с точностью epsilon = " << epsilon << std::endl;
+        outputFile << "Собственных векторы и значения, найденные методом вращений с точностью epsilon = " << epsilon << std::endl;
         auto answer = solver.find(epsilon, maxIterations);
         outputEigenVectorsAndValues(outputFile, answer);
         outputFile << std::endl << "Количество итераций " << solver.getCountIterations() << std::endl;
+        outputFile << std::endl << "Проверка:" << std::endl;
+        check(outputFile, A, answer);
         std::cout << "Done! Check file outfile.txt" << std::endl;
     }
     catch (std::exception &ex)

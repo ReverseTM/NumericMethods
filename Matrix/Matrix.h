@@ -37,6 +37,10 @@ public:
 
     int getCols() const;
 
+    std::vector<double> getRow(int rowIndex) const;
+
+    std::vector<double> getCol(int colIndex) const;
+
     void printRow(std::ostream &out, int rowIndex) const;
 
     void printCol(std::ostream &out,int colIndex) const;

@@ -219,24 +219,32 @@ Matrix operator~(const Matrix &A)
     return C;
 }
 
+std::vector<double> Matrix::getRow(int rowIndex) const
+{
+    return data[rowIndex];
+}
+
+std::vector<double> Matrix::getCol(int colIndex) const
+{
+    std::vector<double> col(rows);
+    for (int i = 0; i < rows; ++i) col[i] = data[i][colIndex];
+    return col;
+}
+
 void Matrix::printRow(std::ostream &out, int rowIndex) const
 {
     if (rowIndex < 0 || rowIndex > rows) throw std::runtime_error("Index out of bound!");
-    for (int i = 0; i < cols; ++i)
-    {
-        out << data[rowIndex][i];
-        if (i != cols - 1) out << " ";
-    }
+
+    out << "(";
+    for (int i = 0; i < cols; ++i) out << data[rowIndex][i] << ((i != cols - 1) ? ", " : ")");
 }
 
 void Matrix::printCol(std::ostream &out, int colIndex) const
 {
     if (colIndex < 0 || colIndex > cols) throw std::runtime_error("Index out of bound!");
-    for (int i = 0; i < rows; ++i)
-    {
-        out << data[i][colIndex];
-        if (i != rows - 1) out << " ";
-    }
+
+    out << "(";
+    for (int i = 0; i < rows; ++i) out << data[i][colIndex] << ((i != rows - 1) ? ", " : ")^T");
 }
 
 int Matrix::getRows() const
