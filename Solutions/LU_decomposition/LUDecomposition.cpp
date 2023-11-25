@@ -52,7 +52,7 @@ void LUDecomposition::lu_decomposition()
 {
     if (rows != cols)
     {
-        return;
+        throw std::runtime_error("Expected square matrix, but rectangular found! Therefore inversion of given matrix is impossible.");
     }
 
     U = this->matrix;

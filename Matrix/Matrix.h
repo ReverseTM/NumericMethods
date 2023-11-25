@@ -15,6 +15,7 @@ class Matrix final {
     friend class SeidelMethod;
     friend class AbstractFinder;
     friend class RotationMethod;
+    friend class QRDecomposition;
 
 private:
 
@@ -51,9 +52,9 @@ public:
 
     friend Matrix operator*(const Matrix &A, const Matrix &B);
 
-    friend Matrix operator*(const Matrix &A, int x);
+    friend Matrix operator*(const Matrix &A, double x);
 
-    friend Matrix operator*(int x, const Matrix &A);
+    friend Matrix operator*(double x, const Matrix &A);
 
     void operator*() const;
 

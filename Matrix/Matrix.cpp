@@ -143,12 +143,12 @@ std::vector<double> operator*(const Matrix &A, const std::vector<double> &vector
     return C;
 }
 
-Matrix operator*(int x, const Matrix &A)
+Matrix operator*(double x, const Matrix &A)
 {
     return A * x;
 }
 
-Matrix operator*(const Matrix &A, int x)
+Matrix operator*(const Matrix &A, double x)
 {
     Matrix C(A.rows, A.cols);
 

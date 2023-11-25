@@ -5,6 +5,7 @@
 #include "Solutions/SimpleIterationsMethod/SimpleIterationsMethod.h"
 #include "Solutions/SeidelMethod/SeidelMethod.h"
 #include "EigenVectorsAndValues/RotationMethod/RotationMethod.h"
+#include "EigenVectorsAndValues/QR_decomposition/QRDecomposition.h"
 
 //Вывод вектора
 std::ostream& operator<<(std::ostream &out, const std::vector<double> &vector)
@@ -262,7 +263,7 @@ void task3(const std::string &inputFileName, const std::string &outputFileName)
 
     std::vector<std::string> methodName = {"Метод простых итераций", "Метод Зейделя"};
 
-    double eps = 0.000001;
+    double eps = 0.001;
     int maxIterations = 1000;
 
     try
@@ -319,6 +320,36 @@ void task4(const std::string &inputFileName, const std::string &outputFileName)
     outputFile.close();
 }
 
+void task5(const std::string &inputFileName, const std::string &outputFileName)
+{
+    auto resources = getResourcesForEigenVectors(inputFileName);
+    Matrix A = std::get<0>(resources);
+    double epsilon = std::get<1>(resources);
+    int maxIterations = std::get<2>(resources);
+
+    std::ofstream outputFile(outputFileName);
+
+    outputOfInitialValues(outputFile, A);
+
+    QRDecomposition finder(A);
+
+    try
+    {
+        outputFile << "Собственных векторы и значения, найденные с помощью QR разложения с точностью epsilon = " << epsilon << std::endl;
+        auto answer = finder.find(epsilon, maxIterations);
+        for (int i = 0; i < answer.size(); ++i) outputFile << "Значение #" << i + 1 << " = " << answer[i] << std::endl;
+        outputFile << std::endl << "Количество итераций " << finder.getCountIterations() << std::endl;
+        std::cout << "Done! Check file outfile.txt" << std::endl;
+    }
+    catch (std::exception &ex)
+    {
+        outputFile << ex.what();
+        outputFile.close();
+    }
+
+    outputFile.close();
+}
+
 int main() {
 
     const std::string inputFileName = "../FilesWithResults/input.txt";
@@ -327,7 +358,8 @@ int main() {
 //    task1(inputFileName, outputFileName);
 //    task2(inputFileName, outputFileName);
 //    task3(inputFileName, outputFileName);
-    task4(inputFileName, outputFileName);
+//    task4(inputFileName, outputFileName);
+    task5(inputFileName, outputFileName);
 
     return 0;
 }
