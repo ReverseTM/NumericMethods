@@ -1,12 +1,12 @@
 #include "SimpleIterationsMethod.h"
 
-SimpleIterationsMethod::SimpleIterationsMethod(Matrix &A) :
+SimpleIterations::SimpleIterations(Matrix &A) :
     AbstractSolution(A)
 {
 
 }
 
-std::vector<double> SimpleIterationsMethod::solution(std::vector<double> vector, double epsilon, int maxIterations)
+std::vector<double> SimpleIterations::solution(std::vector<double> vector, double epsilon, int maxIterations)
 {
     if (!isCorrectMatrix())
     {
@@ -57,7 +57,7 @@ std::vector<double> SimpleIterationsMethod::solution(std::vector<double> vector,
     throw std::runtime_error("Max iterations");
 }
 
-bool SimpleIterationsMethod::isCorrectMatrix() const
+bool SimpleIterations::isCorrectMatrix() const
 {
     for (int i = 0; i < rows; ++i)
     {
@@ -69,7 +69,7 @@ bool SimpleIterationsMethod::isCorrectMatrix() const
     return true;
 }
 
-long long SimpleIterationsMethod::getCountIterations() const
+long long SimpleIterations::getCountIterations() const
 {
     return iterations;
 }

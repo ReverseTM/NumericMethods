@@ -1,11 +1,15 @@
 #include <iostream>
 #include <tuple>
-#include "Solutions/LU_decomposition/LUDecomposition.h"
-#include "Solutions/SweepMethod/SweepMethod.h"
-#include "Solutions/SimpleIterationsMethod/SimpleIterationsMethod.h"
-#include "Solutions/SeidelMethod/SeidelMethod.h"
-#include "EigenVectorsAndValues/RotationMethod/RotationMethod.h"
-#include "EigenVectorsAndValues/QR_decomposition/QRDecomposition.h"
+#include "lab1/Solutions/LU_decomposition/LUDecomposition.h"
+#include "lab1/Solutions/SweepMethod/SweepMethod.h"
+#include "lab1/Solutions/SimpleIterationsMethod/SimpleIterationsMethod.h"
+#include "lab1/Solutions/SeidelMethod/SeidelMethod.h"
+#include "lab1/EigenVectorsAndValues/RotationMethod/RotationMethod.h"
+#include "lab1/EigenVectorsAndValues/QR_decomposition/QRDecomposition.h"
+#include "lab2/SimpleIterationsMethod/SimpleIterations.h"
+#include "lab2/NewtonMethod/NewtonMethod.h"
+#include "lab2/SimpleIterationsMethod/SISystem.h"
+#include "lab2/NewtonMethod/NMSystem.h"
 
 //Вывод вектора
 std::ostream& operator<<(std::ostream &out, const std::vector<double> &vector)
@@ -257,7 +261,7 @@ void task3(const std::string &inputFileName, const std::string &outputFileName)
 
     std::vector<AbstractSolution*> solvers
     {
-        new SimpleIterationsMethod(A),
+        new SimpleIterations(A),
         new SeidelMethod(A)
     };
 
@@ -350,6 +354,147 @@ void task5(const std::string &inputFileName, const std::string &outputFileName)
     outputFile.close();
 }
 
+void task6(const std::string &inputFileName, const std::string &outputFileName)
+{
+    double x0 = 0.0;
+    double epsilon = 0.001;
+    int maxIterations = 10000;
+
+    auto myFunction { [](double x) {return x * exp(x) + x * x - 1;} };
+    auto derivative { [](double x) {return exp(x) + x * exp(x) + 2 * x;} };
+
+    std::ofstream outputFile(outputFileName);
+
+    try
+    {
+        double x;
+        int iterations;
+
+        auto result1 = SimpleIterationsMethod::solve(
+                [](double x) {return (x - 0.1345 * ( x * exp(x) + x * x - 1 ));},
+                x0,
+                epsilon,
+                maxIterations
+                );
+
+        x = std::get<0>(result1);
+        iterations = std::get<1>(result1);
+
+        outputFile << "С помощью метода простых итераций найден корень = " << x << " за " << iterations << " итераций с точностью " << epsilon << std::endl;
+
+        outputFile << "Подставив найденный x в исходное уравнение: F(" << x << ") = " << myFunction(x) << std::endl;
+
+        auto result2 = NewtonMethod::solve(
+                myFunction,
+                derivative,
+                x0,
+                epsilon,
+                maxIterations
+                );
+
+        x = std::get<0>(result2);
+        iterations = std::get<1>(result2);
+
+        outputFile << "С помощью метода Ньютона найден корень = " << x << " за " << iterations << " итераций с точностью " << epsilon << std::endl;
+
+        outputFile << "Подставив найденный x в исходное уравнение: F(" << x << ") = " << myFunction(x) << std::endl;
+
+        std::cout << "Done! Check file outfile.txt" << std::endl;
+    }
+    catch (std::exception &ex)
+    {
+        outputFile << ex.what();
+        outputFile.close();
+    }
+
+    outputFile.close();
+
+}
+
+void task7(const std::string &inputFileName, const std::string &outputFileName)
+{
+    double x0 = 0.0;
+    double epsilon = 0.00001;
+    int maxIterations = 10000;
+
+    std::vector<double (*)(std::vector<double>)> functionsForSimpleIterations =
+    {
+            [](std::vector<double> x){ return cos(x[1]) / 2; },
+            [](std::vector<double> x) { return exp(x[0]) / 2; }
+    };
+
+    auto func1 = [](std::vector<double> x) { return 2 * x[0] - cos(x[1]); };
+    auto func2 = [](std::vector<double> x) {return 2 * x[1] - exp(x[0]); };
+
+    std::vector<double (*)(std::vector<double>)> functionsForNewtonMethod =
+    {
+            func1,
+            func2
+    };
+
+    std::vector<double (*)(std::vector<double>)> derivativesForNewtonMethod =
+    {
+            [](std::vector<double> x) { return 2.0; }, //  df1/dx1
+            [](std::vector<double> x) { return sin(x[1]); }, //  df1/dx2
+            [](std::vector<double> x) { return -exp(x[0]); }, //  df2/dx1
+            [](std::vector<double> x) { return 2.0; } //  df2/dx2
+    };
+
+    std::ofstream outputFile(outputFileName);
+
+    try
+    {
+        std::vector<double> x;
+        int iterations;
+
+        auto result1 = SISystem::solve(
+                functionsForSimpleIterations,
+                x0,
+                epsilon,
+                maxIterations
+        );
+
+        x = std::get<0>(result1);
+        iterations = std::get<1>(result1);
+
+        outputFile << "С помощью метода простых итераций с точностью " << epsilon << " найдены корни:" << std::endl;
+        for (int i = 0; i < x.size(); ++i) outputFile << "x" << i + 1 << " = " << x[i] << std::endl;
+        outputFile << "совершенно " << iterations << " итераций." << std::endl;
+
+        outputFile << "Подставив найденные x в исходные уравнения:" << std::endl;
+        outputFile << "F1(" << x[0] << ", " << x[1] << ") = " << func1(x) << std::endl;
+        outputFile << "F2(" << x[0] << ", " << x[1] << ") = " << func2(x) << std::endl;
+
+        auto result2 = NMSystem::solve(
+                functionsForNewtonMethod,
+                derivativesForNewtonMethod,
+                x0,
+                epsilon,
+                maxIterations
+        );
+
+        x = std::get<0>(result2);
+        iterations = std::get<1>(result2);
+        outputFile << "---------------------------------------------------------------------" << std::endl;
+        outputFile << "С помощью метода Ньютона с точностью " << epsilon << " найдены корни:" << std::endl;
+        for (int i = 0; i < x.size(); ++i) outputFile << "x" << i + 1 << " = " << x[i] << std::endl;
+        outputFile << "совершенно " << iterations << " итераций." << std::endl;
+
+        outputFile << "Подставив найденные x в исходные уравнения:" << std::endl;
+        outputFile << "F1(" << x[0] << ", " << x[1] << ") = " << func1(x) << std::endl;
+        outputFile << "F2(" << x[0] << ", " << x[1] << ") = " << func2(x) << std::endl;
+
+        std::cout << "Done! Check file outfile.txt" << std::endl;
+    }
+    catch (std::exception &ex)
+    {
+        outputFile << ex.what();
+        outputFile.close();
+    }
+
+    outputFile.close();
+}
+
 int main() {
 
     const std::string inputFileName = "../FilesWithResults/input.txt";
@@ -359,7 +504,9 @@ int main() {
 //    task2(inputFileName, outputFileName);
 //    task3(inputFileName, outputFileName);
 //    task4(inputFileName, outputFileName);
-    task5(inputFileName, outputFileName);
+//    task5(inputFileName, outputFileName);
+//    task6(inputFileName, outputFileName);
+    task7(inputFileName, outputFileName);
 
     return 0;
 }

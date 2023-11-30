@@ -3,7 +3,7 @@
 
 #include "../AbstractSolution.h"
 
-class SimpleIterationsMethod final : public AbstractSolution
+class SimpleIterations final : public AbstractSolution
 {
 
 private:
@@ -12,7 +12,7 @@ private:
 
 public:
 
-    explicit SimpleIterationsMethod(Matrix &A);
+    explicit SimpleIterations(Matrix &A);
 
 public:
 

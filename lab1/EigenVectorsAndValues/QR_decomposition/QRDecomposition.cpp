@@ -136,6 +136,7 @@ bool QRDecomposition::eigenValuesReady(const Matrix &A, double epsilon)
 
             if (d >= 0)
             {
+                d = std::sqrt(d);
                 std::pair<double, double> delta( -b / 2 + d / 2 - previous_lambda.first, 0 );
                 previous_lambda = { -b / 2 + d / 2, 0 };
 

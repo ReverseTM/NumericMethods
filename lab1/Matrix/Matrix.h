@@ -11,11 +11,12 @@ class Matrix final {
     friend class AbstractSolution;
     friend class LUDecomposition;
     friend class SweepMethod;
-    friend class SimpleIterationsMethod;
+    friend class SimpleIterations;
     friend class SeidelMethod;
     friend class AbstractFinder;
     friend class RotationMethod;
     friend class QRDecomposition;
+    friend class NMSystem;
 
 private:
 
