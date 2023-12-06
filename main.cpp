@@ -10,6 +10,14 @@
 #include "lab2/NewtonMethod/NewtonMethod.h"
 #include "lab2/SimpleIterationsMethod/SISystem.h"
 #include "lab2/NewtonMethod/NMSystem.h"
+#include "lab3/Polynomials/LagrangePolynomial.h"
+#include "lab3/Polynomials/NewtonPolynomial.h"
+#include "lab3/Differentiation/Differentiation.h"
+#include "lab3/Integrals/AbstractIntegrater.h"
+#include "lab3/Integrals/Rectangle/RectangleMethod.h"
+#include "lab3/Integrals/Trapezoid/TrapezoidMethod.h"
+#include "lab3/Integrals/Simpson/SimpsonMethod.h"
+
 
 //Вывод вектора
 std::ostream& operator<<(std::ostream &out, const std::vector<double> &vector)
@@ -424,7 +432,7 @@ void task7(const std::string &inputFileName, const std::string &outputFileName)
     };
 
     auto func1 = [](std::vector<double> x) { return 2 * x[0] - cos(x[1]); };
-    auto func2 = [](std::vector<double> x) {return 2 * x[1] - exp(x[0]); };
+    auto func2 = [](std::vector<double> x) { return 2 * x[1] - exp(x[0]); };
 
     std::vector<double (*)(std::vector<double>)> functionsForNewtonMethod =
     {
@@ -495,6 +503,127 @@ void task7(const std::string &inputFileName, const std::string &outputFileName)
     outputFile.close();
 }
 
+void task8(const std::string &inputFileName, const std::string &outputFileName)
+{
+    std::ofstream out(outputFileName);
+
+    std::vector<double> x2 = {0.1, 0.5, 0.9, 1.3, 1.5};
+    std::vector<double> x1 = {0.1, 0.5, 1.1, 1.3, 1.5};
+    double x0 = 0.8;
+
+    auto function = [](double x) { return log(x) + x; };
+
+    std::string polynomialString;
+    double result;
+
+    auto answer1 = NewtonPolynomial::interpolation(
+            function,
+            x1,
+            x0);
+
+    polynomialString = std::get<0>(answer1);
+    result = std::get<1>(answer1);
+
+    out << polynomialString << std::endl;
+    out << "P" + std::to_string(x1.size() - 1) + "(" << x0 << ") = " << result << std::endl;
+    out << "f(" << x0 << ") = " << function(x0) << std::endl;
+    out << "Погрешность " << result - function(x0) << std::endl;
+
+    out << "-------------------------------------------" << std::endl;
+
+    auto answer2 = LagrangePolynomial::interpolation(
+            function,
+            x2,
+            x0);
+
+
+    polynomialString = std::get<0>(answer2);
+    result = std::get<1>(answer2);
+
+    out << polynomialString << std::endl;
+    out << "L" + std::to_string(x2.size() - 1) + "(" << x0 << ") = " << result << std::endl;
+    out << "f(" << x0 << ") = " << function(x0) << std::endl;
+    out << "Погрешность " << result - function(x0) << std::endl;
+
+    out.close();
+}
+
+void task9(const std::string &inputFileName, const std::string &outputFileName)
+{
+
+}
+
+void task10(const std::string &inputFileName, const std::string &outputFileName)
+{
+
+}
+
+void task11(const std::string &inputFileName, const std::string &outputFileName)
+{
+    std::ofstream out(outputFileName);
+
+    std::vector<double> x = {0.0, 1.0, 2.0, 3.0, 4.0};
+    std::vector<double> y = {0.0, 2.0, 3.4142, 4.7321, 6.0};
+    double x0 = 2.0;
+
+    int index;
+    for (int i = 0; i < x.size(); ++i) if (std::abs(x[i] - x0) < 0.000001) index = i - 1;
+
+    out << "Левосторонняя производная " << "y'(" << x0 << ") = " << Differentiation::firstDerivative(x, y, index) << std::endl;
+    out << "Правосторонняя производная " << "y'(" << x0 << ") = " << Differentiation::firstDerivative(x, y, index + 1) << std::endl;
+    out << "Первая производная " << "y'(" << x0 << ") = " << Differentiation::firstDerivativeApproximation(x, y, x0, index) << std::endl;
+    out << "Вторая производная " << "y''(" << x0 << ") = " << Differentiation::secondDerivative(x, y, index) << std::endl;
+
+    out.close();
+}
+
+
+
+void task12(const std::string &inputFileName, const std::string &outputFileName)
+{
+    std::ofstream out(outputFileName);
+    out.precision(9);
+
+    double a = 0.0;
+    double b = 2.0;
+
+    std::vector<double> h = { 0.5, 0.25 };
+
+    std::vector<std::string> methodNames =
+            {
+                "Результат метода прямоугольников при h = ",
+                "Результат метода трапеций при h = ",
+                "Результат метода Симпсона при h = "
+            };
+
+    auto function = [](double x) { return (x * x) / (pow(x, 4) + 256); };
+
+    std::vector<AbstractIntegrater*> integrators =
+            {
+                new RectangleMethod(),
+                new TrapezoidMethod(),
+                new SimpsonMethod()
+            };
+
+    for (int i = 0; i < methodNames.size(); ++i)
+    {
+        double result_h1 = integrators[i]->integrate(function, a, b, h[0]);
+        out << methodNames[i] << h[0] << ": " << result_h1 << std::endl;
+
+        double result_h2 = integrators[i]->integrate(function, a, b, h[1]);
+        out << methodNames[i] << h[1] << ": " << result_h2 << std::endl;
+
+        double result = AbstractIntegrater::rungeRoombergMethod(result_h1, result_h2, 2);
+        out << "Погрешность: " << std::abs(result - result_h2) << std::endl;
+
+        out << "---------------------------------------------------" << std::endl;
+    }
+
+    for (auto x : integrators) delete x;
+
+    out.close();
+}
+
 int main() {
 
     const std::string inputFileName = "../FilesWithResults/input.txt";
@@ -506,7 +635,12 @@ int main() {
 //    task4(inputFileName, outputFileName);
 //    task5(inputFileName, outputFileName);
 //    task6(inputFileName, outputFileName);
-    task7(inputFileName, outputFileName);
+//    task7(inputFileName, outputFileName);
+//    task8(inputFileName, outputFileName);
+//    task9(inputFileName, outputFileName);
+//    task10(inputFileName, outputFileName);
+//    task11(inputFileName, outputFileName);
+    task12(inputFileName, outputFileName);
 
     return 0;
 }

@@ -31,6 +31,10 @@ std::vector<std::string> QRDecomposition::find(double epsilon, int maxIterations
         matrix = R * Q;
     }
 
+//    std::ofstream out("../FilesWithResults/outfile.txt");
+//    out << "Матрица:" << std::endl << matrix << std::endl;
+//    out.close();
+
     if (iterations == maxIterations - 1) throw std::runtime_error("Max iterations");
 
     std::vector<std::string> eigenValues(rows);
