@@ -605,7 +605,7 @@ void task12(const std::string &inputFileName, const std::string &outputFileName)
                 new SimpsonMethod()
             };
 
-    for (int i = 0; i < methodNames.size(); ++i)
+    for (int i = 0; i < methodNames.size() - 1; ++i)
     {
         double result_h1 = integrators[i]->integrate(function, a, b, h[0]);
         out << methodNames[i] << h[0] << ": " << result_h1 << std::endl;
@@ -614,10 +614,22 @@ void task12(const std::string &inputFileName, const std::string &outputFileName)
         out << methodNames[i] << h[1] << ": " << result_h2 << std::endl;
 
         double result = AbstractIntegrater::rungeRoombergMethod(result_h1, result_h2, 2);
+        out << "Результат по методу Рунге-Румбергу: " << result << std::endl;
         out << "Погрешность: " << std::abs(result - result_h2) << std::endl;
 
         out << "---------------------------------------------------" << std::endl;
     }
+
+    double result_h1 = integrators[2]->integrate(function, a, b, h[0]);
+    out << methodNames[2] << h[0] << ": " << result_h1 << std::endl;
+
+    double result_h2 = integrators[2]->integrate(function, a, b, h[1]);
+    out << methodNames[2] << h[1] << ": " << result_h2 << std::endl;
+
+    double result = AbstractIntegrater::rungeRoombergMethod(result_h1, result_h2, 4);
+    out << "Результат по методу Рунге-Румбергу: " << result << std::endl;
+    out << "Погрешность: " << std::abs(result - result_h2) << std::endl;
+
 
     for (auto x : integrators) delete x;
 
